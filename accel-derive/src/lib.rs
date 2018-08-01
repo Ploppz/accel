@@ -14,7 +14,10 @@ use std::fs;
 
 #[proc_macro_attribute]
 pub fn kernel(_attr: TokenStream, func: TokenStream) -> TokenStream {
-    let func = syn::parse(func).expect("Not a function");
+    let mut func: syn::ItemFn = syn::parse(func).expect("Not a function");
+    // IntelliJ IDEA fix: remove the two first arguments
+    func.decl.inputs = func.decl.inputs.clone().into_iter().skip(2).collect();
+
     let ptx_str = func2kernel(&func);
     func2caller(&ptx_str, &func)
 }
